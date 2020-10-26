@@ -10,7 +10,7 @@ For cuML/cuDf prototypes: models/
 
 For sklearn prototypes: tests/
 
-# Dealing with conda issues
+### Dealing with conda issues
 
 There seems to be many issues when trying to run the Jupyter Notebooks from the preloaded rapids ml conda environment kernel. 
 
@@ -31,5 +31,4 @@ gpulogin1 $ conda install ipykernel
 # We are currently having some issues with our xcat images on the GPU cluster and user anaconda installs. For your own sanity run:
 gpulogin1 $ chmod -R 0700 ~/.conda/envs/myRapid
 ```
-
-
+Following these steps, once logged onto you JupyterHub, you should see the new kernel.
