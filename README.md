@@ -10,7 +10,7 @@ For cuML/cuDf prototypes: models/
 
 For sklearn prototypes: tests/
 
-# Dealing with conda issues
+### Dealing with conda issues
 
 There seems to be many issues when trying to run the Jupyter Notebooks from the preloaded rapids ml conda environment kernel. 
 
