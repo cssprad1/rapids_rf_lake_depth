@@ -18,7 +18,10 @@ class DaskCumlRF():
 	def __init__(self, param):
 		self.hyper_params = param
 		#self.model = cumlDaskRF(n
-		self.model = cumlDaskRF(n_estimators = param['N_ESTIMATORS'],
+		if param is None:
+			self.model = cumlDaskRF()
+		else:
+			self.model = cumlDaskRF(n_estimators = param['N_ESTIMATORS'],
 								split_algo = param['SPLIT_ALGO'],
 								split_criterion = param['SPLIT_CRITERION'],
 								bootstrap = param['BOOTSTRAP'],
@@ -73,7 +76,7 @@ class DaskCumlRF():
 
 		return mae_score, r2, mse
 
-	def feature_importances(cv_train, labels_train, show = False):
+	def feature_importances(self, cv_train, labels_train, show = False):
 		perm_imp = permutation_importance(self.model, cv_train, labels_train)
 		sorted_idx = perm_imp = resilt.importances_mean.argsort()
 		sorted_idx = np.flip(sorted_idx)
@@ -85,7 +88,7 @@ class DaskCumlRF():
 		plt.xticks(range(len(importance)), list(cv_train.to_pandas().columns[sorted_idx]))
 		plt.title("Mean Permutation_importance")
 		
-		if show = True:
+		if show is True:
 			plt.show()
 		else:
 			plt.savefig('plt_saved_.png')
