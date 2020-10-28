@@ -3,7 +3,8 @@ from src import dask_preperation as dp
 from dask.distributed import Client, wait
 from models import custom_RF as md
 from load_dataset import custom_lakedepth as data_prep
-
+from pprint import pprint
+import time
 if __name__ == '__main__':
 
 	#sys.path.append('..')
@@ -11,6 +12,7 @@ if __name__ == '__main__':
     dask = dp.Dask(1, 8)
     c = Client(dask.cluster)
     dask.set_client(c)
+    print(c)
     cols = ['FID', 'Date']
     pred = 'Depth_m'
     data = data_prep.LakeDepth(42)
@@ -32,10 +34,13 @@ if __name__ == '__main__':
 					   'SEED' :  42,
 					   'VERBOSE' : False
 					   }
-    print(hyperparameters)
+    pprint(hyperparameters)
     rf = md.DaskCumlRF(hyperparameters)
     cv_dt, l_dt = dask.distribute(cv_train, l_train)
     cv_dte, l_dte = dask.distribute(cv_test, l_test)
+    st = time.time()
     rf.train(cv_dt, l_dt)
+    et = time.time()
+    print("Time to train: ", et-st)
     rf.get_metrics(cv_dte, l_test)
     
