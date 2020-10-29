@@ -4,11 +4,12 @@ Author: Caleb Spradlin
 Email: caleb.s.spradlin@nasa.gov
 
 Decription: Houses the abstraction classes for the Random Forest models
-			Adds in functionality such as training, getting metrics, etc. 
+			Adds in functionality such as training, getting metrics, etc.
 			See individual class descriptions for more information
 """
 # Import system modules
 import time
+import joblib
 
 # Import RAPIDS related modules
 import cuml
@@ -34,7 +35,7 @@ class DaskCumlRF():
     def __init__(self, param):
         '''
         Initializes a cuML RF model with the given parameters
-        <param> is the parameter dictionary which assigns the entire parameter suite to the RF model. 
+        <param> is the parameter dictionary which assigns the entire parameter suite to the RF model.
         <model> is the actual GPU-based model
         '''
         self.hyper_params = param
@@ -59,10 +60,8 @@ class DaskCumlRF():
                                     verbose=param['VERBOSE'])
 
     def update_model_params(self, param):
-		'''
-		Update the model parameters to your heart's desire
-		<param> model parameters to update model with
-		'''
+		#"""Update the model parameters to your heart's desire
+		#<param> model parameters to update model with"""
         self.hyper_params = param
         self.model = cumlDaskRF(n_estimators=param['N_ESTIMATORS'],
                                 split_algo=param['SPLIT_ALGO'],
@@ -131,9 +130,10 @@ class cuRF():
         <param> is the parameter dictionary which assigns the entire parameter suite to the RF model. 
         <model> is the actual GPU-based model
         '''
-        self.hyper_params = param
+        
         if param is None:
             self.model = clRF()
+            self.hyper_params = self.model.get_params()
         else:
             self.model = clRF(n_estimators=param['N_ESTIMATORS'],
                               split_algo=param['SPLIT_ALGO'],
@@ -151,9 +151,10 @@ class cuRF():
                               quantile_per_tree=param['QUANTILEPT'],
                               seed=param['SEED'],
                               verbose=param['VERBOSE'])
+            self.hyper_params = self.model.get_params()
 
     def update_model_params(self, param):
-		'''
+        '''
 		Update the model parameters to your heart's desire
 		<param> model parameters to update model with
 		'''
@@ -205,7 +206,7 @@ class cuRF():
         return mae_score, r2, mse
 
     def feature_importances(self, cv_train, labels_train):
-		'''
+        '''
 		Computes the importances of the features of the model object
 		Algorithm used: permutation_importance
 		<cv_train> the permutation alg uses this to find the most important features
@@ -227,3 +228,25 @@ class cuRF():
             plt.show()
         else:
             plt.savefig('plt_saved_.png')
+
+
+def save_raw_model(model, filename):
+	"""
+	helper function to save cuML model
+	<model> must be a raw cuML or cuML-Dask model
+	<filename> to save in saved_models directory
+	"""
+	filename = "".join(["models/saved_models/", filename])
+	joblib.dump(model,filename)
+
+def load_model(filename):
+	"""
+	helper function to save cuML model
+	returns a custom_RF cuRF object
+	"""
+	filename = "".join(["models/saved_models/", filename])
+	loaded_model = joblib.load(filename)
+	ld_model = cuRF(None)
+	ld_model.model = loaded_model
+	return ld_model
+
