@@ -10,7 +10,8 @@ Decription: Houses the abstraction classes for the Random Forest models
 # Import system modules
 import time
 import joblib
-
+import numpy as np
+import matplotlib.pyplot as plt
 # Import RAPIDS related modules
 import cuml
 
@@ -183,6 +184,9 @@ class cuRF():
 		<labels_train> labels (y) to train model on
         '''
         self.model.fit(covariates_train, labels_train)
+    def get_score(self, covaraites_test, labels_test):
+        score = self.model.score(covaraites_test, labels_test)
+        return score
 
     def get_metrics(self, covariates_test, labels_test):
         '''
@@ -205,7 +209,7 @@ class cuRF():
 
         return mae_score, r2, mse
 
-    def feature_importances(self, cv_train, labels_train):
+    def feature_importances(self, cv_train, labels_train, show = False):
         '''
 		Computes the importances of the features of the model object
 		Algorithm used: permutation_importance
@@ -213,7 +217,7 @@ class cuRF():
 		<labels_train>
 		'''
         perm_imp = permutation_importance(self.model, cv_train, labels_train)
-        sorted_idx = perm_imp = resilt.importances_mean.argsort()
+        sorted_idx = perm_imp.importances_mean.argsort()
         sorted_idx = np.flip(sorted_idx)
         importance = perm_imp.importances_mean
         for i, v in enumerate(importance[sorted_idx]):

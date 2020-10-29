@@ -12,7 +12,7 @@ if __name__ == '__main__':
     cv_train, cv_test, l_train, l_test = data.split(0.20)
 
     # Params for our fancy GPU-based RF model
-    hyperparameters = {'N_ESTIMATORS' : 1000,
+    hyperparameters = {'N_ESTIMATORS' : 200,
 					   'SPLIT_ALGO' : 1,
 					   'SPLIT_CRITERION' : 2,
 					   'BOOTSTRAP' : True,
@@ -41,4 +41,5 @@ if __name__ == '__main__':
     print("Time to train: ", et-st)
     
     rf.get_metrics(cv_test, l_test)
+    rf.feature_importances(cv_train, l_train, show = False)
     
