@@ -59,6 +59,10 @@ class DaskCumlRF():
                                     verbose=param['VERBOSE'])
 
     def update_model_params(self, param):
+		'''
+		Update the model parameters to your heart's desire
+		<param> model parameters to update model with
+		'''
         self.hyper_params = param
         self.model = cumlDaskRF(n_estimators=param['N_ESTIMATORS'],
                                 split_algo=param['SPLIT_ALGO'],
@@ -80,6 +84,8 @@ class DaskCumlRF():
     def train(self, covariates_train, labels_train):
         '''
         Trains the model and waits for all parallel processes to return before returning the function
+		<covariates_train> covariates (x) to train model on
+		<labels_train> labels (y) to train model on
         '''
         self.model.fit(covariates_train, labels_train)
         wait(self.model.rfs)
@@ -88,6 +94,8 @@ class DaskCumlRF():
         '''
         Gets the metrics based off of three common regression scores: mean_absolute_error, mean_squared_error, and r2_score
         Computes the predictions
+		<covaraites_test> covariates (x) to test the model on
+		<labels_test> labels (y) to test the model on
         '''
         covariates_test = covariates_test.to_pandas()
         labels_test = labels_test.to_pandas()
@@ -118,6 +126,11 @@ class cuRF():
     such as updating the model parameters, and getting model metrics (evaluations)
     '''
     def __init__(self, param):
+        '''
+        Initializes a cuML RF model with the given parameters
+        <param> is the parameter dictionary which assigns the entire parameter suite to the RF model. 
+        <model> is the actual GPU-based model
+        '''
         self.hyper_params = param
         if param is None:
             self.model = clRF()
@@ -140,6 +153,10 @@ class cuRF():
                               verbose=param['VERBOSE'])
 
     def update_model_params(self, param):
+		'''
+		Update the model parameters to your heart's desire
+		<param> model parameters to update model with
+		'''
         self.hyper_params = param
         self.model = clRF(n_estimators=param['N_ESTIMATORS'],
                           split_algo=param['SPLIT_ALGO'],
@@ -159,11 +176,20 @@ class cuRF():
                           verbose=param['VERBOSE'])
 
     def train(self, covariates_train, labels_train):
-
+        '''
+        Trains the model
+		<covariates_train> covariates (x) to train model on
+		<labels_train> labels (y) to train model on
+        '''
         self.model.fit(covariates_train, labels_train)
 
     def get_metrics(self, covariates_test, labels_test):
-
+        '''
+        Gets the metrics based off of three common regression scores: mean_absolute_error, mean_squared_error, and r2_score
+        Computes the predictions
+		<covaraites_test> covariates (x) to test the model on
+		<labels_test> labels (y) to test the model on
+        '''		
         predictions = self.model.predict(covariates_test)
 
         mae_score = mean_absolute_error(
@@ -179,6 +205,12 @@ class cuRF():
         return mae_score, r2, mse
 
     def feature_importances(self, cv_train, labels_train):
+		'''
+		Computes the importances of the features of the model object
+		Algorithm used: permutation_importance
+		<cv_train> the permutation alg uses this to find the most important features
+		<labels_train>
+		'''
         perm_imp = permutation_importance(self.model, cv_train, labels_train)
         sorted_idx = perm_imp = resilt.importances_mean.argsort()
         sorted_idx = np.flip(sorted_idx)
