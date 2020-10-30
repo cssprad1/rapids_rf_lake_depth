@@ -23,12 +23,14 @@ Please follow these steps to clone the correct conda environment:
 $ mv ~/.conda $NOBACKUP
 $ ln -s $NOBACKUP/.conda ~/.conda
 # Clone the environment to user space so that it gets brought back to the old module. (Do this on the new gpu cluster)
-gpulogin1 $ module load anaconda
-gpulogin1 $ conda create -n myRapids --clone rapids -y
-gpulogin1 $ conda activate myRapids
+gpulogin1 $ module load anaconda/3-2020.07
+gpulogin1 $ conda create -n rapids-0.16 -c rapidsai -c nvidia -c conda-forge \
+    -c defaults rapids=0.16 python=3.7 cudatoolkit=10.2
+gpulogin1 $ conda activate rapids-0.16
 # Make sure ipykernel is installed so that you can use it with JH.
 gpulogin1 $ conda install ipykernel
+gpulogin1 $ conda install -c conda-forge dask-ml
 # We are currently having some issues with our xcat images on the GPU cluster and user anaconda installs. For your own sanity run:
-gpulogin1 $ chmod -R 0700 ~/.conda/envs/myRapid
+gpulogin1 $ chmod -R 0700 ~/.conda/envs/rapids-0.16
 ```
 After following these steps, log onto your JH intance and you should see a JH kernel named "myRapids".

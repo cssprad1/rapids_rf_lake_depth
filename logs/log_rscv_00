@@ -1,0 +1,60 @@
+ - from DATA: reading csv into GPU memory
+ - from DATA: done reading csv into GPU memory
+ - from DATA: dropped column: FID
+ - from DATA: dropped column: Date
+{'bootstrap': [True, False],
+ 'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
+ 'max_features': ['auto', 'sqrt'],
+ 'n_bins': [5, 6, 8, 10, 11, 13, 15, 16, 18, 20],
+ 'n_estimators': [200,
+                  294,
+                  389,
+                  484,
+                  578,
+                  673,
+                  768,
+                  863,
+                  957,
+                  1052,
+                  1147,
+                  1242,
+                  1336,
+                  1431,
+                  1526,
+                  1621,
+                  1715,
+                  1810,
+                  1905,
+                  2000]}
+{'ACCURACY_METRIC': 'mean_ae',
+ 'BOOTSTRAP': True,
+ 'BOOTSTRAP_FEATURES': False,
+ 'MAX_DEPTH': 10,
+ 'MAX_FEATURES': 'auto',
+ 'MAX_LEAVES': -1,
+ 'MIN_IMPURITY_DECREASE': 0.0,
+ 'MIN_ROWS_PER_NODE': 2,
+ 'N_BINS': 8,
+ 'N_ESTIMATORS': 1431,
+ 'QUANTILEPT': False,
+ 'ROWS_SAMPLE': 1.0,
+ 'SEED': 42,
+ 'SPLIT_ALGO': 1,
+ 'SPLIT_CRITERION': 2,
+ 'VERBOSE': False}
+   - from RS_CV: Fold #: 0
+   - from RS_CV: time to train (sec): 3.110454797744751
+   - from RS_CV: Score: 430.26221328401925
+   - from RS_CV: Fold #: 1
+   - from RS_CV: time to train (sec): 3.2061376571655273
+   - from RS_CV: Score: 416.49073897733444
+   - from RS_CV: Fold #: 2
+   - from RS_CV: time to train (sec): 3.1714158058166504
+   - from RS_CV: Score: 441.609781529834
+   - from RS_CV: time to train and score (sec): 11.598591089248657
+[{'bootstrap': True,
+  'max_depth': 10,
+  'max_features': 'auto',
+  'n_bins': 8,
+  'n_estimators': 1431,
+  'performance': 429.45424459706254}]
