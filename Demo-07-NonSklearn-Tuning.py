@@ -10,7 +10,7 @@ import time
 if __name__ == '__main__':
     data = ld.LakeDepth(42)
     cv_train, cv_test, l_train, l_test = data.split(0.20)
-    results = rscv.random_cv_search(1, 2, cv_train, l_train)
+    results = rscv.random_cv_search(300, 3, cv_train, l_train)
     pprint(results)
 	#sys.path.append('..')
     """

@@ -23,8 +23,7 @@ from cuml.dask.ensemble import RandomForestRegressor as cumlDaskRF
 # Calculate metrics with these modules
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-
-
+#from dask_ml.metrics import r2_score, mean_absolute_error, mean_squared_error
 class DaskCumlRF():
     '''
     Class: DaskCumlRF
@@ -97,10 +96,12 @@ class DaskCumlRF():
 		<covaraites_test> covariates (x) to test the model on
 		<labels_test> labels (y) to test the model on
         '''
-        covariates_test = covariates_test.to_pandas()
-        labels_test = labels_test.to_pandas()
-        predictions = self.model.predict(covariates_test)
-        predictions = predictions.to_pandas()
+        #from cuml.metrics.regression import r2_score, mean_absolute_error, mean_squared_error
+        #covariates_test = covariates_test.to_pandas()
+        #labels_test = labels_test.to_pandas()
+        predictions = self.model.predict(covariates_test).compute()
+        predictions = predictions.to_array()
+        labels_test = labels_test.to_array()
         mae_score = mean_absolute_error(labels_test, predictions)
         r2 = r2_score(labels_test, predictions)
         mse = mean_squared_error(labels_test, predictions)
