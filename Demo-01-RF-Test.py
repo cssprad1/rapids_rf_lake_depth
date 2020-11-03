@@ -6,22 +6,29 @@ import time
 if __name__ == '__main__':
 
 	#sys.path.append('..')
-    
+    '''
+ {'bootstrap': True,
+  'max_depth': 110,
+  'max_features': 'sqrt',
+  'n_bins': 6,
+  'n_estimators': 1147,
+  'performance': 1.1887009},
+    '''
     # Import the LakeDepth data with random-seed of 42
     data = ld.LakeDepth(42)
     cv_train, cv_test, l_train, l_test = data.split(0.20)
 
     # Params for our fancy GPU-based RF model
-    hyperparameters = {'N_ESTIMATORS' : 200,
+    hyperparameters = {'N_ESTIMATORS' : 1150,
 					   'SPLIT_ALGO' : 1,
 					   'SPLIT_CRITERION' : 2,
 					   'BOOTSTRAP' : True,
 					   'BOOTSTRAP_FEATURES' : False,
 					   'ROWS_SAMPLE' : 1.0,
-					   'MAX_DEPTH' : 20,
+					   'MAX_DEPTH' : 110,
 					   'MAX_LEAVES' : -1,
-					   'MAX_FEATURES' : 'auto',
-					   'N_BINS' : 16,
+					   'MAX_FEATURES' : 'sqrt',
+					   'N_BINS' : 6,
 					   'MIN_ROWS_PER_NODE' : 2,
 					   'MIN_IMPURITY_DECREASE' : 0.0,
 					   'ACCURACY_METRIC' : 'mean_ae', # 'mse' #'r2' # 'median_aw' # 

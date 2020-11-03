@@ -25,7 +25,7 @@ class LakeDepth():
         '''
         # Set all object-specific variables
         self.predictor = 'Depth_m'
-        self.cols_to_drop = ['FID', 'Date']
+        self.cols_to_drop = ['FID', 'Date']#, 'b8_LC8_075']
         self.FEATURES_PATH = os.path.join(os.path.join(os.getcwd(), 'load_dataset'),
                                           'LakeDepth/pts_merged_final.csv')
         self.random_state = random_state
@@ -52,5 +52,5 @@ class LakeDepth():
         cv_train, cv_test, labels_train, labels_test = train_test_split(self.covariates,
                                                                         self.labels,
                                                                         test_size=test_size,
-                                                                        random_state=self.random_state)
+                                                                        shuffle=True,    random_state=self.random_state)
         return cv_train, cv_test, labels_train, labels_test

@@ -19,15 +19,16 @@ if __name__ == '__main__':
     n_workers = len(workers)
     n_streams = 8 # Performance optimization
     data = ld.LakeDepth(42)
-    covariates_train, covariates_test, labels_train, labels_test = data.split(0.20)
-    covariates_test_pd = covariates_test.to_pandas()
-    labels_test_pd = labels_test.to_pandas()
+    covariates_train = data.covariates
+    labels_train = data.labels
+    #covariates_test_pd = covariates_test.to_pandas()
+    #labels_test_pd = labels_test.to_pandas()
     k_fold = KFold(5)
     results = []
     TEST_SIZE = 0.20
     RANDOM_STATE = 42
     n_partitions = n_workers
-    N_ESTIMATORS = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]
+    N_ESTIMATORS = [int(x) for x in np.linspace(start=200, stop=2000, num=20)]
     SPLIT_ALGO = 1
     SPLIT_CRITERION = 2
     BOOTSTRAP = [True, False]
@@ -49,7 +50,7 @@ if __name__ == '__main__':
                'max_features': MAX_FEATURES,
                'n_bins': N_BINS}
     pprint(random_grid)
-    for i in range(1):
+    for i in range(100):
         print("  - from Random Search: Epoch #", i)
 
         n_estimators=random.choice(N_ESTIMATORS)
@@ -85,7 +86,8 @@ if __name__ == '__main__':
                           quantile_per_tree=quantile_per_tree,
                           seed=seed,
                           verbose=verbose)
-        scores = []
+        scores_r2 = []
+        scores_mae = []
         st = time.time()
         for k, (train, test) in enumerate(k_fold.split(covariates_train, labels_train)):
             
@@ -104,21 +106,29 @@ if __name__ == '__main__':
 
             predictions = depth_rf_model.predict(X_dask_cudf_test).compute()
             predictions = predictions.to_array()
-            score = mean_absolute_error(labels_train.iloc[test].to_array(), predictions)
-            scores.append(score)
+            score_mae = mean_absolute_error(labels_train.iloc[test].to_array(), predictions)
+            score_r2 = r2_score(labels_train.iloc[test].to_array(), predictions)
+            scores_mae.append(score_mae)
+            scores_r2.append(score_r2)
             et = time.time()
-
             del X_dask_cudf_test, y_dask_cudf_test
 
             print("   -time to train (sec): ", et-st)
         
-        del depth_rf_model
+        #del depth_rf_model
         
         results.append({'n_estimators': n_estimators,
                     'bootstrap': bootstrap,
                     'max_depth': max_depth,
                     'max_features': max_features,
                     'n_bins': n_bins,
-                    'performance': np.mean(scores)})
-
+                    'performance_mae': np.mean(scores_mae),
+                    'performance_r2' : np.mean(scores_r2)})
+    #results.sort(key=lambda x: x['performance_mae'])
+    results.sort(key=lambda x: x['performance_r2'])
+    pprint(results)
+    print("==================================")
+    print("******** r2 **********************")
+    print("==================================")
+    results.sort(key=lambda x: x['performance_mae'])
     pprint(results)

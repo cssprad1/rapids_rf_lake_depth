@@ -132,7 +132,6 @@ class cuRF():
         <param> is the parameter dictionary which assigns the entire parameter suite to the RF model. 
         <model> is the actual GPU-based model
         '''
-        
         if param is None:
             self.model = clRF()
             self.hyper_params = self.model.get_params()
@@ -185,30 +184,30 @@ class cuRF():
 		<labels_train> labels (y) to train model on
         '''
         self.model.fit(covariates_train, labels_train)
+    
     def get_score(self, covaraites_test, labels_test):
         score = self.model.score(covaraites_test, labels_test)
         return score
 
     def get_metrics(self, covariates_test, labels_test):
         '''
-        Gets the metrics based off of three common regression scores: mean_absolute_error, mean_squared_error, and r2_score
+        Gets the metrics based off of three common regression scores: mean_absolute_error,
+        mean_squared_error, and r2_score
         Computes the predictions
 		<covaraites_test> covariates (x) to test the model on
 		<labels_test> labels (y) to test the model on
         '''		
         predictions = self.model.predict(covariates_test)
-
-        mae_score = mean_absolute_error(
-            labels_test.to_pandas(), predictions.to_pandas())
+        mae_score = mean_absolute_error(labels_test.to_pandas(), predictions.to_pandas())
         r2 = r2_score(labels_test.to_pandas(), predictions.to_pandas())
-        mse = mean_squared_error(
-            labels_test.to_pandas(), predictions.to_pandas())
+        mse = mean_squared_error(labels_test.to_pandas(), predictions.to_pandas())
+        
         print("Scores ------")
         print(" MAE: ", mae_score)
         print("  r2: ", r2)
         print(" MSE: ", mse)
 
-        return mae_score, r2, mse
+        return predictions, mae_score, r2, mse
 
     def feature_importances(self, cv_train, labels_train, show = False):
         '''
@@ -217,17 +216,24 @@ class cuRF():
 		<cv_train> the permutation alg uses this to find the most important features
 		<labels_train>
 		'''
+        cv_list = list(cv_train.to_pandas().columns)
         perm_imp = permutation_importance(self.model, cv_train, labels_train)
         sorted_idx = perm_imp.importances_mean.argsort()
         sorted_idx = np.flip(sorted_idx)
         importance = perm_imp.importances_mean
-        for i, v in enumerate(importance[sorted_idx]):
-            print('Feature: %0d, Score: %.5f' % (i, v))
+        feature_importances = [(feature, (round(importance, 5))) for
+                              feature, importance in zip(cv_list, importance)]
+        feature_importances = sorted(feature_importances, key = lambda x: x[1], reverse = True)
+        [print('Variables: {:20} Importance: {}'.format(*pair)) for pair in feature_importances];
         plt.figure(figsize=(20, 8))
         plt.bar([x for x in range(len(importance))], importance[sorted_idx])
-        plt.xticks(range(len(importance)), list(
-            cv_train.to_pandas().columns[sorted_idx]))
+        x_tick_list = cv_train.to_pandas().columns[sorted_idx]
+        x_tick_adjusted_length = []
+        for tick in x_tick_list:
+            x_tick_adjusted_length.append(tick[:3])
+        plt.xticks(range(len(importance)), x_tick_adjusted_length)
         plt.title("Mean Permutation_importance")
+        plt.gcf().subplots_adjust(bottom=0.15)
 
         if show is True:
             plt.show()

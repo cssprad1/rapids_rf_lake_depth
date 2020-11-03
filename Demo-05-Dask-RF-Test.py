@@ -38,7 +38,6 @@ if __name__ == '__main__':
     pprint(hyperparameters)
     rf = md.DaskCumlRF(hyperparameters)
     cv_dt, l_dt = dask.distribute(cv_train, l_train)
-    #cv_dte, l_dte = dask.distribute(cv_test, l_test)
     st = time.time()
     rf.train(cv_dt, l_dt)
     et = time.time()
