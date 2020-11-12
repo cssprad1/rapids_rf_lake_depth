@@ -261,3 +261,7 @@ def load_model(filename):
 	ld_model.model = loaded_model
 	return ld_model
 
+def load_raw_model(filename):
+    filename = "".join(["models/saved_models/", filename])
+    loaded_model = joblib.load(filename)
+    return loaded_model

@@ -1,5 +1,5 @@
 .ipynb_checkpoints
-./models/saved_models/*
+./models/saved_models/**
 __pycache__
 dask-worker-space
 models/saved_models/best_test_01.sav
@@ -13,3 +13,7 @@ logs/log_rscv_02
 .gitignore
 logs/log_rscv_03
 logs/log_rscv_04
+logs/**
+predictions/**
+**.tif
+predictions
