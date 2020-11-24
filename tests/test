@@ -1,0 +1,63 @@
+import random
+from pprint import pprint
+import numpy as np
+import cupy as cp
+
+from src import dask_preperation as dp
+from sklearn.metrics import mean_absolute_error
+from dask.distributed import Client, wait
+from models import custom_RF as md
+from load_dataset import custom_lakedepth as data_prep
+import time
+import dask_cudf
+from dask_ml import model_selection
+
+if __name__ == '__main__':
+
+    dask = dp.Dask(1, 8)
+    c = Client(dask.cluster)
+    dask.set_client(c)
+    print(c)
+    data = data_prep.LakeDepth(42)
+    cv_train, cv_test, l_train, l_test = data.split(0.20)
+
+    N_ESTIMATORS = [int(x) for x in np.linspace(start=600, stop=2000, num=10)]
+    SPLIT_ALGO = 1
+    SPLIT_CRITERION = 2
+    BOOTSTRAP = [True, False]
+    BOOTSTRAP_FEATURES = False
+    ROWS_SAMPLE = 1.0
+    MAX_DEPTH = [int(x) for x in np.linspace(10, 110, num=11)]
+    MAX_LEAVES = -1
+    MAX_FEATURES = ['auto', 'sqrt']
+    N_BINS = [int(x) for x in np.linspace(start=5, stop=20, num=10)]
+    MIN_ROWS_PER_NODE = 2
+    MIN_IMPURITY_DECREASE = 0.0
+    ACCURACY_METRIC = 'mean_ae'  # 'mse' #'r2' # 'median_aw' #
+    QUANTILEPT = False
+    SEED = 42
+    VERBOSE = False
+
+    random_grid = {'n_estimators': N_ESTIMATORS,
+                   'max_depth': MAX_DEPTH,
+                   'bootstrap': BOOTSTRAP,
+                   'max_features': MAX_FEATURES,
+                   'n_bins': N_BINS}
+
+    pprint(random_grid)
+
+    rf = md.cuRF(None)
+    print(rf.hyper_params)
+    rf_random_search_dask_model = model_selection.RandomizedSearchCV(estimator=rf.model,
+                                                                     param_distributions=random_grid,
+                                                                     n_iter=1,
+                                                                     cv=3,
+                                                                     random_state=42)
+    #cv_dt, l_dt = dask.distribute(cv_train, l_train)
+    st = time.time()
+    print(type(rf_random_search_dask_model))
+    #rf_random_search_dask_model.fit(cv_train, l_train)
+    et = time.time()
+    print("Time to train: ", et-st)
+    #del cv_dt, l_dt
+    #print(sorted(rf_random_search_dask_model.cv_results_.keys()))
