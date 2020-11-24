@@ -33,4 +33,4 @@ gpulogin1 $ conda install -c conda-forge dask-ml
 # We are currently having some issues with our xcat images on the GPU cluster and user anaconda installs. For your own sanity run:
 gpulogin1 $ chmod -R 0700 ~/.conda/envs/rapids-0.16
 ```
-After following these steps, log onto your JH intance and you should see a JH kernel named "myRapids".
+Following these steps, once logged onto you JupyterHub, you should see the new kernel.

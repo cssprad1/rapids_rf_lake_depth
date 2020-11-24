@@ -16,4 +16,11 @@ logs/log_rscv_04
 logs/**
 predictions/**
 **.tif
-predictions
+models/saved_models/sklearn_model_0.sav
+load_dataset/LakeDepth/bands_20170714_t213741_extract.csv
+.vscode
+
+models/saved_models/k_fold_389_estimators
+models/saved_models/k_fold_1052_estimators
+models/saved_models/k_fold_1150_estimators
+models/saved_models/test_out.sav
