@@ -7,7 +7,7 @@ from sklearn.model_selection import KFold
 from models import custom_RF as cm
 
 
-def k_fold_train(folds, model, cv_train, l_train):
+def k_fold_train(folds, model, nth_band, start_index, cv_train, l_train):
 
     k_fold = KFold(folds)
     scores = []
@@ -28,6 +28,6 @@ def k_fold_train(folds, model, cv_train, l_train):
     et_total = time.time()
     print(' - from k_fold: time to train and eval:', et_total - st_total)
     cm.save_raw_model(
-        model, 'k_fold_' + str(model.hyper_params['n_estimators']) + '_estimators')
+        model, 'k_fold_' + str(nth_band) + '_' + str(start_index) + '_estimators')
 
     return model
