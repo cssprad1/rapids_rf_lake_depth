@@ -82,7 +82,7 @@ def map_apply_reduce_pandas(img_ndarray_input, model, shape):
 def output_gtiff(prediction_array, img_properties, img_ndarray, current_tif, output_directory):
     n_cols, n_rows, n_bands, gt, crs, ndval = img_properties 
 
-    prediction_array[img_ndarray[:, :, 0] == -9999.0] = ndval
+    prediction_array[img_ndarray[:, :, 0] == -9999.0] = np.float32(0)
 
     file_name_no_ext = current_tif.split('.', 1)[0]
     file_name_predicted = file_name_no_ext + '_predicted.tif'

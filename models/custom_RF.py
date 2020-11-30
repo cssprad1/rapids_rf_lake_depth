@@ -24,6 +24,8 @@ from cuml.dask.ensemble import RandomForestRegressor as cumlDaskRF
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 #from dask_ml.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+
 class DaskCumlRF():
     '''
     Class: DaskCumlRF
@@ -60,8 +62,8 @@ class DaskCumlRF():
                                     verbose=param['VERBOSE'])
 
     def update_model_params(self, param):
-		#"""Update the model parameters to your heart's desire
-		#<param> model parameters to update model with"""
+        # """Update the model parameters to your heart's desire
+        # <param> model parameters to update model with"""
         self.hyper_params = param
         self.model = cumlDaskRF(n_estimators=param['N_ESTIMATORS'],
                                 split_algo=param['SPLIT_ALGO'],
@@ -83,8 +85,8 @@ class DaskCumlRF():
     def train(self, covariates_train, labels_train):
         '''
         Trains the model and waits for all parallel processes to return before returning the function
-		<covariates_train> covariates (x) to train model on
-		<labels_train> labels (y) to train model on
+                <covariates_train> covariates (x) to train model on
+                <labels_train> labels (y) to train model on
         '''
         self.model.fit(covariates_train, labels_train)
         wait(self.model.rfs)
@@ -93,8 +95,8 @@ class DaskCumlRF():
         '''
         Gets the metrics based off of three common regression scores: mean_absolute_error, mean_squared_error, and r2_score
         Computes the predictions
-		<covaraites_test> covariates (x) to test the model on
-		<labels_test> labels (y) to test the model on
+                <covaraites_test> covariates (x) to test the model on
+                <labels_test> labels (y) to test the model on
         '''
         #from cuml.metrics.regression import r2_score, mean_absolute_error, mean_squared_error
         #covariates_test = covariates_test.to_pandas()
@@ -126,6 +128,7 @@ class cuRF():
     This class also adds in functionality so code does not have to be rewritten in individual scripts,
     such as updating the model parameters, and getting model metrics (evaluations)
     '''
+
     def __init__(self, param):
         '''
         Initializes a cuML RF model with the given parameters
@@ -156,9 +159,9 @@ class cuRF():
 
     def update_model_params(self, param):
         '''
-		Update the model parameters to your heart's desire
-		<param> model parameters to update model with
-		'''
+                Update the model parameters to your heart's desire
+                <param> model parameters to update model with
+                '''
         self.hyper_params = param
         self.model = clRF(n_estimators=param['N_ESTIMATORS'],
                           split_algo=param['SPLIT_ALGO'],
@@ -180,11 +183,11 @@ class cuRF():
     def train(self, covariates_train, labels_train):
         '''
         Trains the model
-		<covariates_train> covariates (x) to train model on
-		<labels_train> labels (y) to train model on
+                <covariates_train> covariates (x) to train model on
+                <labels_train> labels (y) to train model on
         '''
         self.model.fit(covariates_train, labels_train)
-    
+
     def get_score(self, covaraites_test, labels_test):
         score = self.model.score(covaraites_test, labels_test)
         return score
@@ -194,14 +197,16 @@ class cuRF():
         Gets the metrics based off of three common regression scores: mean_absolute_error,
         mean_squared_error, and r2_score
         Computes the predictions
-		<covaraites_test> covariates (x) to test the model on
-		<labels_test> labels (y) to test the model on
-        '''		
+                <covaraites_test> covariates (x) to test the model on
+                <labels_test> labels (y) to test the model on
+        '''
         predictions = self.model.predict(covariates_test)
-        mae_score = mean_absolute_error(labels_test.to_pandas(), predictions.to_pandas())
+        mae_score = mean_absolute_error(
+            labels_test.to_pandas(), predictions.to_pandas())
         r2 = r2_score(labels_test.to_pandas(), predictions.to_pandas())
-        mse = mean_squared_error(labels_test.to_pandas(), predictions.to_pandas())
-        
+        mse = mean_squared_error(
+            labels_test.to_pandas(), predictions.to_pandas())
+
         print("Scores ------")
         print(" MAE: ", mae_score)
         print("  r2: ", r2)
@@ -209,22 +214,24 @@ class cuRF():
 
         return predictions, mae_score, r2, mse
 
-    def feature_importances(self, cv_train, labels_train, show = False):
+    def feature_importances(self, cv_train, labels_train, show=False, nth_band=0, starting_index=0):
         '''
-		Computes the importances of the features of the model object
-		Algorithm used: permutation_importance
-		<cv_train> the permutation alg uses this to find the most important features
-		<labels_train>
-		'''
+                Computes the importances of the features of the model object
+                Algorithm used: permutation_importance
+                <cv_train> the permutation alg uses this to find the most important features
+                <labels_train>
+                '''
         cv_list = list(cv_train.to_pandas().columns)
         perm_imp = permutation_importance(self.model, cv_train, labels_train)
         sorted_idx = perm_imp.importances_mean.argsort()
         sorted_idx = np.flip(sorted_idx)
         importance = perm_imp.importances_mean
         feature_importances = [(feature, (round(importance, 5))) for
-                              feature, importance in zip(cv_list, importance)]
-        feature_importances = sorted(feature_importances, key = lambda x: x[1], reverse = True)
-        [print('Variables: {:20} Importance: {}'.format(*pair)) for pair in feature_importances];
+                               feature, importance in zip(cv_list, importance)]
+        feature_importances = sorted(
+            feature_importances, key=lambda x: x[1], reverse=True)
+        [print('Variables: {:20} Importance: {}'.format(*pair))
+         for pair in feature_importances]
         plt.figure(figsize=(20, 8))
         plt.bar([x for x in range(len(importance))], importance[sorted_idx])
         x_tick_list = cv_train.to_pandas().columns[sorted_idx]
@@ -235,31 +242,36 @@ class cuRF():
         plt.title("Mean Permutation_importance")
         plt.gcf().subplots_adjust(bottom=0.15)
 
+        name = 'permutation_importance_'+str(nth_band)+'_'+str(starting_index) +\
+            '_'+str(time.time())+'.png'
         if show is True:
             plt.show()
+            plt.savefig(name)
         else:
-            plt.savefig('plt_saved_.png')
+            plt.savefig(name)
 
 
 def save_raw_model(model, filename):
-	"""
-	helper function to save cuML model
-	<model> must be a raw cuML or cuML-Dask model
-	<filename> to save in saved_models directory
-	"""
-	filename = "".join(["models/saved_models/", filename])
-	joblib.dump(model,filename)
+    """
+    helper function to save cuML model
+    <model> must be a raw cuML or cuML-Dask model
+    <filename> to save in saved_models directory
+    """
+    filename = "".join(["models/saved_models/", filename])
+    joblib.dump(model, filename)
+
 
 def load_model(filename):
-	"""
-	helper function to save cuML model
-	returns a custom_RF cuRF object
-	"""
-	filename = "".join(["models/saved_models/", filename])
-	loaded_model = joblib.load(filename)
-	ld_model = cuRF(None)
-	ld_model.model = loaded_model
-	return ld_model
+    """
+    helper function to save cuML model
+    returns a custom_RF cuRF object
+    """
+    filename = "".join(["models/saved_models/", filename])
+    loaded_model = joblib.load(filename)
+    ld_model = cuRF(None)
+    ld_model.model = loaded_model
+    return ld_model
+
 
 def load_raw_model(filename):
     filename = "".join(["models/saved_models/", filename])
