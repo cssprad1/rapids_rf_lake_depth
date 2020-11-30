@@ -225,7 +225,7 @@ class cuRF():
         perm_imp = permutation_importance(self.model, cv_train, labels_train)
         sorted_idx = perm_imp.importances_mean.argsort()
         sorted_idx = np.flip(sorted_idx)
-        importance = perm_imp.importances_mean
+        importance = -1 * perm_imp.importances_mean
         feature_importances = [(feature, (round(importance, 5))) for
                                feature, importance in zip(cv_list, importance)]
         feature_importances = sorted(
